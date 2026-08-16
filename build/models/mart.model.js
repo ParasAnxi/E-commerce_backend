@@ -33,24 +33,19 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Product = void 0;
+exports.Mart = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const productSchema = new mongoose_1.Schema({
-    martId: { type: String, required: true },
+const martSchema = new mongoose_1.Schema({
     name: { type: String, required: true, trim: true },
-    weight: { type: String, required: true },
-    price: { type: Number, required: true, min: 0 },
-    originalPrice: { type: Number, required: true, min: 0 },
-    discountPercentage: { type: Number, default: 0, min: 0, max: 100 },
     rating: { type: Number, default: 0, min: 0, max: 5 },
     reviews: { type: Number, default: 0, min: 0 },
-    brand: { type: String, required: true, trim: true },
-    type: { type: String, required: true, trim: true },
-    description: { type: String, required: true },
+    deliveryTime: { type: String, required: true },
+    isFreeDelivery: { type: Boolean, required: true, default: false },
+    minOrderFreeDelivery: { type: Number, default: 0, min: 0 },
     imageUrl: { type: String, required: true },
-    categoryId: { type: String, required: true },
+    address: { type: String, trim: true },
 }, {
     timestamps: true,
 });
-productSchema.index({ name: 'text', description: 'text', brand: 'text' });
-exports.Product = mongoose_1.default.model('Product', productSchema);
+martSchema.index({ name: 'text', address: 'text' });
+exports.Mart = mongoose_1.default.model('Mart', martSchema);

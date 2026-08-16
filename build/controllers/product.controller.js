@@ -2,9 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteProduct = exports.updateProduct = exports.getProductById = exports.getProducts = exports.createProduct = void 0;
 const product_model_1 = require("../models/product.model");
-// @desc    Create a new product
-// @route   POST /api/products
-// @access  Private
+// Create new product || route /api/products || Private
 const createProduct = async (req, res) => {
     try {
         const product = await product_model_1.Product.create(req.body);
@@ -15,9 +13,7 @@ const createProduct = async (req, res) => {
     }
 };
 exports.createProduct = createProduct;
-// @desc    Get all products (with pagination)
-// @route   GET /api/products
-// @access  Public
+// Get all products || GET /api/products || Public
 const getProducts = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -37,9 +33,7 @@ const getProducts = async (req, res) => {
     }
 };
 exports.getProducts = getProducts;
-// @desc    Get single product by ID
-// @route   GET /api/products/:id
-// @access  Public
+// Get single product by ID || GET / api/products/:id || Public
 const getProductById = async (req, res) => {
     try {
         const product = await product_model_1.Product.findById(req.params.id);
@@ -55,9 +49,7 @@ const getProductById = async (req, res) => {
     }
 };
 exports.getProductById = getProductById;
-// @desc    Update a product
-// @route   PUT /api/products/:id
-// @access  Private
+// Update a product || PUT /api/products/:id || Private
 const updateProduct = async (req, res) => {
     try {
         const product = await product_model_1.Product.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
@@ -73,9 +65,7 @@ const updateProduct = async (req, res) => {
     }
 };
 exports.updateProduct = updateProduct;
-// @desc    Delete a product
-// @route   DELETE /api/products/:id
-// @access  Private
+// Delete a proudct || DELETE /api/products/:id || private
 const deleteProduct = async (req, res) => {
     try {
         const product = await product_model_1.Product.findByIdAndDelete(req.params.id);

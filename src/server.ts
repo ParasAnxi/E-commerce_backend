@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import authRoutes from './routes/auth.routes';
 import productRoutes from './routes/product.routes';
+import martRoutes from './routes/mart.routes';
 import { apiRateLimiter } from './middleware/rateLimiter';
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(cookieParser());
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', apiRateLimiter, productRoutes);
+app.use('/api/marts', apiRateLimiter, martRoutes);
 
 app.get("/", (req: Request, res: Response) => {
     res.send("Hello World! Server is running.");
