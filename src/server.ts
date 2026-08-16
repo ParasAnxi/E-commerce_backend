@@ -4,6 +4,7 @@ import cors from 'cors';
 import authRoutes from './routes/auth.routes';
 import productRoutes from './routes/product.routes';
 import martRoutes from './routes/mart.routes';
+import categoryRoutes from './routes/category.routes';
 import { apiRateLimiter } from './middleware/rateLimiter';
 
 const app = express();
@@ -19,6 +20,7 @@ app.use(cookieParser());
 app.use('/api/auth', authRoutes);
 app.use('/api/products', apiRateLimiter, productRoutes);
 app.use('/api/marts', apiRateLimiter, martRoutes);
+app.use('/api/categories', apiRateLimiter, categoryRoutes);
 
 app.get("/", (req: Request, res: Response) => {
     res.send("Hello World! Server is running.");
