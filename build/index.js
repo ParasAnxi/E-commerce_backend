@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const server_1 = __importDefault(require("./server"));
 const db_1 = __importDefault(require("./config/db"));
 const PORT = process.env.PORT || 3000;
-// Connect to MongoDB
 (0, db_1.default)().then(() => {
     server_1.default.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);

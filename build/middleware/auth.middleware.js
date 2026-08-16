@@ -9,7 +9,6 @@ const user_model_1 = require("../models/user.model");
 const authenticate = async (req, res, next) => {
     try {
         let token;
-        // Check for token in cookies first, then Authorization header
         if (req.cookies && req.cookies.jwt) {
             token = req.cookies.jwt;
         }

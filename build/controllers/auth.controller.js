@@ -29,7 +29,7 @@ const register = async (req, res) => {
                 httpOnly: true,
                 secure: process.env.NODE_ENV !== 'development',
                 sameSite: 'strict',
-                maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+                maxAge: 30 * 24 * 60 * 60 * 1000,
             });
             res.status(201).json({
                 _id: user.id,
@@ -56,7 +56,7 @@ const login = async (req, res) => {
                 httpOnly: true,
                 secure: process.env.NODE_ENV !== 'development',
                 sameSite: 'strict',
-                maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+                maxAge: 30 * 24 * 60 * 60 * 1000,
             });
             res.json({
                 _id: user.id,

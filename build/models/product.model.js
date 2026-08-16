@@ -32,44 +32,26 @@ var __importStar = (this && this.__importStar) || (function () {
         return result;
     };
 })();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
+exports.Product = void 0;
 const mongoose_1 = __importStar(require("mongoose"));
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const userSchema = new mongoose_1.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true,
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true,
-        trim: true,
-    },
-    password: {
-        type: String,
-        required: true,
-        select: false,
-    },
+const productSchema = new mongoose_1.Schema({
+    martId: { type: String, required: true },
+    name: { type: String, required: true, trim: true },
+    weight: { type: String, required: true },
+    price: { type: Number, required: true, min: 0 },
+    originalPrice: { type: Number, required: true, min: 0 },
+    discountPercentage: { type: Number, default: 0, min: 0, max: 100 },
+    rating: { type: Number, default: 0, min: 0, max: 5 },
+    reviews: { type: Number, default: 0, min: 0 },
+    brand: { type: String, required: true, trim: true },
+    type: { type: String, required: true, trim: true },
+    description: { type: String, required: true },
+    imageUrl: { type: String, required: true },
+    categoryId: { type: String, required: true },
 }, {
     timestamps: true,
 });
-userSchema.pre('save', async function () {
-    if (!this.isModified('password')) {
-        return;
-    }
-    const salt = await bcryptjs_1.default.genSalt(10);
-    this.password = await bcryptjs_1.default.hash(this.password, salt);
-});
-userSchema.methods.comparePassword = async function (candidatePassword) {
-    if (!this.password)
-        return false;
-    return bcryptjs_1.default.compare(candidatePassword, this.password);
-};
-exports.User = mongoose_1.default.model('User', userSchema);
+// Add text indexes for potential searching features later
+productSchema.index({ name: 'text', description: 'text', brand: 'text' });
+exports.Product = mongoose_1.default.model('Product', productSchema);
