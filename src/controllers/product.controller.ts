@@ -20,7 +20,12 @@ export const getProducts = async (req: Request, res: Response) => {
         const limit = parseInt(req.query.limit as string) || 10;
         const skip = (page - 1) * limit;
 
-        const products = await Product.find().skip(skip).limit(limit);
+        const products = await Product.find()
+            .populate('martId', 'name logo')
+            .populate('category', 'name iconUrl')
+            .skip(skip)
+            .limit(limit);
+            
         const total = await Product.countDocuments();
 
         res.status(200).json({
@@ -34,11 +39,13 @@ export const getProducts = async (req: Request, res: Response) => {
     }
 };
 
-
 // Get single product by ID || GET / api/products/:id || Public
 export const getProductById = async (req: Request, res: Response) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await Product.findById(req.params.id)
+            .populate('martId', 'name logo')
+            .populate('category', 'name iconUrl');
+            
         if (product) {
             res.status(200).json(product);
         } else {

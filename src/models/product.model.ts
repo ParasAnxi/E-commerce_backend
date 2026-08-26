@@ -1,42 +1,35 @@
 import mongoose, { Document, Schema } from 'mongoose';
+import { IMart } from './mart.model';
 
 export interface IProduct extends Document {
-    martId: string;
+    martId: mongoose.Types.ObjectId | IMart;
     name: string;
-    weight: string;
+    description?: string;
+    category: mongoose.Types.ObjectId | string;
     price: number;
-    originalPrice: number;
-    discountPercentage: number;
-    rating: number;
-    reviews: number;
-    brand: string;
-    type: string;
-    description: string;
-    imageUrl: string;
-    categoryId: string;
+    stock: number;
+    images: string[];
+    isAvailable: boolean;
+    createdAt: string;
+    updatedAt: string;
 }
 
 const productSchema = new Schema<IProduct>(
     {
-        martId: { type: String, required: true },
+        martId: { type: Schema.Types.ObjectId, ref: 'Mart', required: true },
         name: { type: String, required: true, trim: true },
-        weight: { type: String, required: true },
+        description: { type: String, trim: true },
+        category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
         price: { type: Number, required: true, min: 0 },
-        originalPrice: { type: Number, required: true, min: 0 },
-        discountPercentage: { type: Number, default: 0, min: 0, max: 100 },
-        rating: { type: Number, default: 0, min: 0, max: 5 },
-        reviews: { type: Number, default: 0, min: 0 },
-        brand: { type: String, required: true, trim: true },
-        type: { type: String, required: true, trim: true },
-        description: { type: String, required: true },
-        imageUrl: { type: String, required: true },
-        categoryId: { type: String, required: true },
+        stock: { type: Number, required: true, min: 0, default: 0 },
+        images: [{ type: String, required: true }],
+        isAvailable: { type: Boolean, default: true },
     },
     {
         timestamps: true,
     }
 );
 
-productSchema.index({ name: 'text', description: 'text', brand: 'text' });
+productSchema.index({ name: 'text', description: 'text' });
 
 export const Product = mongoose.model<IProduct>('Product', productSchema);

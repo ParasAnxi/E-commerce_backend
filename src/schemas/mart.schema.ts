@@ -1,28 +1,25 @@
 import { z } from 'zod';
+import { addressZodSchema } from './auth.schema';
 
 export const createMartSchema = z.object({
     body: z.object({
         name: z.string().min(1, 'Name is required'),
-        rating: z.number().min(0).max(5).optional(),
-        reviews: z.number().min(0).optional(),
-        deliveryTime: z.string().min(1, 'Delivery time is required'),
-        isFreeDelivery: z.boolean(),
-        minOrderFreeDelivery: z.number().min(0).optional(),
-        imageUrl: z.string().url('Must be a valid URL'),
-        address: z.string().optional(),
+        description: z.string().optional(),
+        logo: z.string().url('Must be a valid URL').optional(),
+        banner: z.string().url('Must be a valid URL').optional(),
+        address: addressZodSchema,
     }),
 });
 
 export const updateMartSchema = z.object({
     body: z.object({
         name: z.string().optional(),
-        rating: z.number().min(0).max(5).optional(),
-        reviews: z.number().min(0).optional(),
-        deliveryTime: z.string().optional(),
-        isFreeDelivery: z.boolean().optional(),
-        minOrderFreeDelivery: z.number().min(0).optional(),
-        imageUrl: z.string().url('Must be a valid URL').optional(),
-        address: z.string().optional(),
+        description: z.string().optional(),
+        logo: z.string().url('Must be a valid URL').optional(),
+        banner: z.string().url('Must be a valid URL').optional(),
+        address: addressZodSchema.optional(),
+        isOpen: z.boolean().optional(),
+        isApproved: z.boolean().optional(),
     }),
     params: z.object({
         id: z.string().min(1, 'Mart ID is required'),

@@ -5,6 +5,8 @@ import authRoutes from './routes/auth.routes';
 import productRoutes from './routes/product.routes';
 import martRoutes from './routes/mart.routes';
 import categoryRoutes from './routes/category.routes';
+import cartRoutes from './routes/cart.routes';
+import orderRoutes from './routes/order.routes';
 import { apiRateLimiter } from './middleware/rateLimiter';
 
 const app = express();
@@ -21,6 +23,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', apiRateLimiter, productRoutes);
 app.use('/api/marts', apiRateLimiter, martRoutes);
 app.use('/api/categories', apiRateLimiter, categoryRoutes);
+app.use('/api/cart', apiRateLimiter, cartRoutes);
+app.use('/api/orders', apiRateLimiter, orderRoutes);
 
 app.get("/", (req: Request, res: Response) => {
     res.send("Hello World! Server is running.");
