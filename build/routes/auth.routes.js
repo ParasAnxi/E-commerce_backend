@@ -12,6 +12,7 @@ const auth_middleware_1 = require("../middleware/auth.middleware");
 const router = express_1.default.Router();
 router.post('/register', (0, validate_middleware_1.validate)(auth_schema_1.registerSchema), auth_controller_1.register);
 router.post('/login', rateLimiter_1.authRateLimiter, (0, validate_middleware_1.validate)(auth_schema_1.loginSchema), auth_controller_1.login);
+router.post('/refresh', auth_controller_1.refresh);
 router.post('/logout', auth_controller_1.logout);
 router.get('/me', auth_middleware_1.authenticate, (req, res) => {
     res.json({ user: req.user });
