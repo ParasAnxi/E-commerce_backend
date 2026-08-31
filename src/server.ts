@@ -8,11 +8,13 @@ import categoryRoutes from './routes/category.routes';
 import cartRoutes from './routes/cart.routes';
 import orderRoutes from './routes/order.routes';
 import { apiRateLimiter } from './middleware/rateLimiter';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
 
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: process.env.CLIENT_URL || 'http://localhost:3000',
     credentials: true, 
 }));
 
@@ -25,9 +27,5 @@ app.use('/api/marts', apiRateLimiter, martRoutes);
 app.use('/api/categories', apiRateLimiter, categoryRoutes);
 app.use('/api/cart', apiRateLimiter, cartRoutes);
 app.use('/api/orders', apiRateLimiter, orderRoutes);
-
-app.get("/", (req: Request, res: Response) => {
-    res.send("Hello World! Server is running.");
-});
 
 export default app;
