@@ -8,7 +8,7 @@ export const createProductSchema = z.object({
         category: z.string().min(1, 'categoryId is required'),
         price: z.number().min(0, 'Price must be a positive number'),
         stock: z.number().min(0, 'Stock must be non-negative'),
-        images: z.array(z.string().url('Must be a valid URL')).min(1, 'At least one image is required'),
+        images: z.array(z.string().min(1, 'Image URL or path is required')).min(1, 'At least one image is required'),
         isAvailable: z.boolean().optional(),
     }),
 });
@@ -20,7 +20,7 @@ export const updateProductSchema = z.object({
         category: z.string().optional(),
         price: z.number().min(0).optional(),
         stock: z.number().min(0).optional(),
-        images: z.array(z.string().url('Must be a valid URL')).optional(),
+        images: z.array(z.string().min(1, 'Image URL or path is required')).optional(),
         isAvailable: z.boolean().optional(),
     }),
     params: z.object({

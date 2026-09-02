@@ -7,8 +7,8 @@ export const createProduct = async (req: Request, res: Response) => {
     try {
         const product = await Product.create(req.body);
         res.status(201).json(product);
-    } catch (error) {
-        res.status(500).json({ message: 'Server Error', error });
+    } catch (error: any) {
+        res.status(400).json({ message: error?.message || 'Failed to create product', error });
     }
 };
 

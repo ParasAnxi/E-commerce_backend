@@ -7,8 +7,8 @@ export const createMart = async (req: Request, res: Response) => {
     try {
         const mart = await Mart.create(req.body);
         res.status(201).json(mart);
-    } catch (error) {
-        res.status(500).json({ message: 'Server Error', error });
+    } catch (error: any) {
+        res.status(400).json({ message: error?.message || 'Failed to create mart', error });
     }
 };
 
