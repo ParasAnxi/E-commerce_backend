@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { Product } from '../models/product.model';
 
 
@@ -47,10 +48,14 @@ export const getProducts = async (req: Request, res: Response) => {
     }
 };
 
-// Get single product by ID || GET / api/products/:id || Public
+// Get single product by ID or slug || GET / api/products/:id || Public
 export const getProductById = async (req: Request, res: Response) => {
     try {
-        const product = await Product.findById(req.params.id)
+        const id = req.params.id as string;
+        const query = mongoose.Types.ObjectId.isValid(id) 
+            ? { _id: id } 
+            : { slug: id };
+        const product = await Product.findOne(query)
             .populate('martId', 'name logo')
             .populate('category', 'name iconUrl');
             
@@ -64,11 +69,15 @@ export const getProductById = async (req: Request, res: Response) => {
     }
 };
 
-// Update a product || PUT /api/products/:id || Private
+// Update a product by ID or slug || PUT /api/products/:id || Private
 export const updateProduct = async (req: Request, res: Response) => {
     try {
-        const product = await Product.findByIdAndUpdate(
-            req.params.id,
+        const id = req.params.id as string;
+        const query = mongoose.Types.ObjectId.isValid(id) 
+            ? { _id: id } 
+            : { slug: id };
+        const product = await Product.findOneAndUpdate(
+            query,
             req.body,
             { new: true, runValidators: true }
         );
@@ -83,10 +92,14 @@ export const updateProduct = async (req: Request, res: Response) => {
     }
 };
 
-// Delete a proudct || DELETE /api/products/:id || private
+// Delete a proudct by ID or slug || DELETE /api/products/:id || private
 export const deleteProduct = async (req: Request, res: Response) => {
     try {
-        const product = await Product.findByIdAndDelete(req.params.id);
+        const id = req.params.id as string;
+        const query = mongoose.Types.ObjectId.isValid(id) 
+            ? { _id: id } 
+            : { slug: id };
+        const product = await Product.findOneAndDelete(query);
 
         if (product) {
             res.status(200).json({ message: 'Product removed' });

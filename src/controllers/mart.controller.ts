@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { Mart } from '../models/mart.model';
 import { User } from '../models/user.model';
 import { AuthRequest } from '../middleware/auth.middleware';
@@ -83,10 +84,14 @@ export const getMarts = async (req: Request, res: Response) => {
     }
 };
 
-// Get single mart by ID || GET /api/marts/:id || Public
+// Get single mart by ID or slug || GET /api/marts/:id || Public
 export const getMartById = async (req: Request, res: Response) => {
     try {
-        const mart = await Mart.findById(req.params.id).populate('ownerId', 'name email');
+        const id = req.params.id as string;
+        const query = mongoose.Types.ObjectId.isValid(id) 
+            ? { _id: id } 
+            : { slug: id };
+        const mart = await Mart.findOne(query).populate('ownerId', 'name email');
         if (mart) {
             res.status(200).json(mart);
         } else {
@@ -97,11 +102,15 @@ export const getMartById = async (req: Request, res: Response) => {
     }
 };
 
-// Update a mart || PUT /api/marts/:id || Private
+// Update a mart by ID or slug || PUT /api/marts/:id || Private
 export const updateMart = async (req: Request, res: Response) => {
     try {
-        const mart = await Mart.findByIdAndUpdate(
-            req.params.id,
+        const id = req.params.id as string;
+        const query = mongoose.Types.ObjectId.isValid(id) 
+            ? { _id: id } 
+            : { slug: id };
+        const mart = await Mart.findOneAndUpdate(
+            query,
             req.body,
             { new: true, runValidators: true }
         );
@@ -116,10 +125,14 @@ export const updateMart = async (req: Request, res: Response) => {
     }
 };
 
-// Delete a mart || DELETE /api/marts/:id || Private
+// Delete a mart by ID or slug || DELETE /api/marts/:id || Private
 export const deleteMart = async (req: Request, res: Response) => {
     try {
-        const mart = await Mart.findByIdAndDelete(req.params.id);
+        const id = req.params.id as string;
+        const query = mongoose.Types.ObjectId.isValid(id) 
+            ? { _id: id } 
+            : { slug: id };
+        const mart = await Mart.findOneAndDelete(query);
 
         if (mart) {
             res.status(200).json({ message: 'Mart removed' });

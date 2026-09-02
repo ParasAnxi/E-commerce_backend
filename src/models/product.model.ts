@@ -10,6 +10,7 @@ export interface IProduct extends Document {
     stock: number;
     images: string[];
     isAvailable: boolean;
+    slug?: string;
     createdAt: string;
     updatedAt: string;
 }
@@ -24,6 +25,7 @@ const productSchema = new Schema<IProduct>(
         stock: { type: Number, required: true, min: 0, default: 0 },
         images: [{ type: String, required: true }],
         isAvailable: { type: Boolean, default: true },
+        slug: { type: String, unique: true, sparse: true },
     },
     {
         timestamps: true,
@@ -31,5 +33,11 @@ const productSchema = new Schema<IProduct>(
 );
 
 productSchema.index({ name: 'text', description: 'text' });
+
+productSchema.pre('save', async function () {
+    if (this.isModified('name') && this.name) {
+        this.slug = this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    }
+});
 
 export const Product = mongoose.model<IProduct>('Product', productSchema);
