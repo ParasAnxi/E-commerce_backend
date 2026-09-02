@@ -20,13 +20,21 @@ export const getProducts = async (req: Request, res: Response) => {
         const limit = parseInt(req.query.limit as string) || 10;
         const skip = (page - 1) * limit;
 
-        const products = await Product.find()
+        const filter: any = {};
+        if (req.query.martId) {
+            filter.martId = req.query.martId;
+        }
+        if (req.query.category) {
+            filter.category = req.query.category;
+        }
+
+        const products = await Product.find(filter)
             .populate('martId', 'name logo')
             .populate('category', 'name iconUrl')
             .skip(skip)
             .limit(limit);
             
-        const total = await Product.countDocuments();
+        const total = await Product.countDocuments(filter);
 
         res.status(200).json({
             products,

@@ -1,6 +1,7 @@
 import express from 'express';
 import {
     createMart,
+    getMyMart,
     getMarts,
     getMartById,
     updateMart,
@@ -11,6 +12,8 @@ import { validate } from '../middleware/validate.middleware';
 import { createMartSchema, updateMartSchema, getMartSchema } from '../schemas/mart.schema';
 
 const router = express.Router();
+
+router.get('/my-mart', authenticate, getMyMart);
 
 router.route('/')
     .get(getMarts)

@@ -1,27 +1,76 @@
 import { Request, Response } from 'express';
 import { Mart } from '../models/mart.model';
+import { User } from '../models/user.model';
+import { AuthRequest } from '../middleware/auth.middleware';
 
-
-// Create new mart || POST /api/marts || Private
+// Create new mart (Apply for Mart) || POST /api/marts || Private
 export const createMart = async (req: Request, res: Response) => {
     try {
-        const mart = await Mart.create(req.body);
+        const authReq = req as AuthRequest;
+        const ownerId = authReq.user?._id || req.body.ownerId;
+
+        if (!ownerId) {
+            return res.status(400).json({ message: 'Owner ID is required to apply for a mart' });
+        }
+
+        const martData = {
+            ...req.body,
+            ownerId,
+            isApproved: false,
+        };
+
+        const mart = await Mart.create(martData);
+
+        if (authReq.user && authReq.user.role === 'customer') {
+            await User.findByIdAndUpdate(authReq.user._id, { role: 'martOwner' });
+        }
+
         res.status(201).json(mart);
     } catch (error: any) {
         res.status(400).json({ message: error?.message || 'Failed to create mart', error });
     }
 };
 
+// Get current user's mart || GET /api/marts/my-mart || Private
+export const getMyMart = async (req: Request, res: Response) => {
+    try {
+        const authReq = req as AuthRequest;
+        const userId = authReq.user?._id;
 
-// Get all marts || GET /api/marts || Public
+        if (!userId) {
+            return res.status(401).json({ message: 'Not authorized' });
+        }
+
+        const mart = await Mart.findOne({ ownerId: userId }).populate('ownerId', 'name email');
+        if (mart) {
+            res.status(200).json(mart);
+        } else {
+            res.status(404).json({ message: 'No mart found for this owner' });
+        }
+    } catch (error: any) {
+        res.status(500).json({ message: 'Server Error', error });
+    }
+};
+
+// Get all marts (with filtering by isApproved / ownerId) || GET /api/marts || Public
 export const getMarts = async (req: Request, res: Response) => {
     try {
         const page = parseInt(req.query.page as string) || 1;
         const limit = parseInt(req.query.limit as string) || 10;
         const skip = (page - 1) * limit;
 
-        const marts = await Mart.find().populate('ownerId', 'name email').skip(skip).limit(limit);
-        const total = await Mart.countDocuments();
+        const filter: any = {};
+
+        if (req.query.isApproved !== undefined) {
+            filter.isApproved = req.query.isApproved === 'true';
+        }
+
+        if (req.query.ownerId) {
+            filter.ownerId = req.query.ownerId;
+        }
+
+        const marts = await Mart.find(filter).populate('ownerId', 'name email').skip(skip).limit(limit);
+        const total = await Mart.countDocuments(filter);
 
         res.status(200).json({
             marts,
