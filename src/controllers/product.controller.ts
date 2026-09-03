@@ -4,9 +4,30 @@ import { Product } from '../models/product.model';
 
 
 // Create new product || route /api/products || Private
-export const createProduct = async (req: Request, res: Response) => {
+export const createProduct = async (req: Request, res: Response): Promise<any> => {
     try {
-        const product = await Product.create(req.body);
+        const body = { ...req.body };
+
+        if (body.martId && !mongoose.Types.ObjectId.isValid(body.martId)) {
+            const mart = await mongoose.model('Mart').findOne({ slug: body.martId });
+            if (!mart) {
+                return res.status(400).json({ message: 'Invalid mart ID or slug' });
+            }
+            body.martId = mart._id;
+        }
+
+        if (body.category && !mongoose.Types.ObjectId.isValid(body.category)) {
+            let category = await mongoose.model('Category').findOne({ slug: body.category });
+            if (!category) {
+                category = await mongoose.model('Category').findOne({ name: { $regex: new RegExp(`^${body.category}$`, 'i') } });
+            }
+            if (!category) {
+                return res.status(400).json({ message: 'Invalid category ID, slug, or name' });
+            }
+            body.category = category._id;
+        }
+
+        const product = await Product.create(body);
         res.status(201).json(product);
     } catch (error: any) {
         res.status(400).json({ message: error?.message || 'Failed to create product', error });
@@ -23,10 +44,35 @@ export const getProducts = async (req: Request, res: Response) => {
 
         const filter: any = {};
         if (req.query.martId) {
-            filter.martId = req.query.martId;
+            const martIdStr = req.query.martId as string;
+            if (mongoose.Types.ObjectId.isValid(martIdStr)) {
+                filter.martId = martIdStr;
+            } else {
+                const mart = await mongoose.model('Mart').findOne({ slug: martIdStr });
+                if (mart) {
+                    filter.martId = mart._id;
+                } else {
+                    return res.status(404).json({ message: 'Mart not found for the provided ID/slug' });
+                }
+            }
         }
         if (req.query.category) {
-            filter.category = req.query.category;
+            const categoryStr = req.query.category as string;
+            if (mongoose.Types.ObjectId.isValid(categoryStr)) {
+                filter.category = categoryStr;
+            } else {
+                const category = await mongoose.model('Category').findOne({ slug: categoryStr });
+                if (category) {
+                    filter.category = category._id;
+                } else {
+                    const categoryByName = await mongoose.model('Category').findOne({ name: { $regex: new RegExp(`^${categoryStr}$`, 'i') } });
+                    if (categoryByName) {
+                        filter.category = categoryByName._id;
+                    } else {
+                       return res.status(404).json({ message: 'Category not found' });
+                    }
+                }
+            }
         }
 
         const products = await Product.find(filter)
@@ -70,15 +116,38 @@ export const getProductById = async (req: Request, res: Response) => {
 };
 
 // Update a product by ID or slug || PUT /api/products/:id || Private
-export const updateProduct = async (req: Request, res: Response) => {
+export const updateProduct = async (req: Request, res: Response): Promise<any> => {
     try {
         const id = req.params.id as string;
         const query = mongoose.Types.ObjectId.isValid(id) 
             ? { _id: id } 
             : { slug: id };
+
+        const body = { ...req.body };
+
+        // Resolve martId if it's a slug
+        if (body.martId && !mongoose.Types.ObjectId.isValid(body.martId)) {
+            const mart = await mongoose.model('Mart').findOne({ slug: body.martId });
+            if (!mart) {
+                return res.status(400).json({ message: 'Invalid mart ID or slug' });
+            }
+            body.martId = mart._id;
+        }
+
+        if (body.category && !mongoose.Types.ObjectId.isValid(body.category)) {
+            let category = await mongoose.model('Category').findOne({ slug: body.category });
+            if (!category) {
+                category = await mongoose.model('Category').findOne({ name: { $regex: new RegExp(`^${body.category}$`, 'i') } });
+            }
+            if (!category) {
+                return res.status(400).json({ message: 'Invalid category ID, slug, or name' });
+            }
+            body.category = category._id;
+        }
+
         const product = await Product.findOneAndUpdate(
             query,
-            req.body,
+            body,
             { new: true, runValidators: true }
         );
 
