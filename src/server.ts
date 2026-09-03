@@ -8,6 +8,7 @@ import categoryRoutes from './routes/category.routes';
 import cartRoutes from './routes/cart.routes';
 import orderRoutes from './routes/order.routes';
 import uploadRoutes from './routes/upload.routes';
+import wishlistRoutes from './routes/wishlist.routes';
 import { apiRateLimiter } from './middleware/rateLimiter';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -29,5 +30,6 @@ app.use('/api/categories', apiRateLimiter, categoryRoutes);
 app.use('/api/cart', apiRateLimiter, cartRoutes);
 app.use('/api/orders', apiRateLimiter, orderRoutes);
 app.use('/api/upload', apiRateLimiter, uploadRoutes);
+app.use('/api/wishlist', apiRateLimiter, wishlistRoutes);
 
 export default app;
