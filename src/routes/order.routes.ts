@@ -1,8 +1,10 @@
 import express from 'express';
 import {
     placeOrder,
+    verifyPayment,
     getMyOrders,
     getMartOrders,
+    getAllOrders,
     updateOrderStatus,
     updatePaymentStatus
 } from '../controllers/order.controller';
@@ -17,8 +19,14 @@ router.use(authenticate);
 router.route('/')
     .post(validate(placeOrderSchema), placeOrder);
 
+router.route('/verify')
+    .post(verifyPayment);
+
 router.route('/myorders')
     .get(getMyOrders);
+
+router.route('/all')
+    .get(getAllOrders);
 
 router.route('/mart/:martId')
     .get(getMartOrders);

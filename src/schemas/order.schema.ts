@@ -5,7 +5,7 @@ export const placeOrderSchema = z.object({
     body: z.object({
         martId: z.string().min(1, 'martId is required'),
         shippingAddress: addressZodSchema,
-        paymentMethod: z.enum(['card', 'cod', 'upi', 'wallet']),
+        paymentMethod: z.enum(['card', 'cod', 'upi', 'wallet', 'razorpay']),
     }),
 });
 

@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express, { Request, Response } from 'express';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -10,8 +13,6 @@ import orderRoutes from './routes/order.routes';
 import uploadRoutes from './routes/upload.routes';
 import wishlistRoutes from './routes/wishlist.routes';
 import { apiRateLimiter } from './middleware/rateLimiter';
-import dotenv from 'dotenv';
-dotenv.config();
 
 const app = express();
 

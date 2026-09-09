@@ -5,7 +5,7 @@ import { IProduct } from './product.model';
 
 export type OrderStatus = "pending" | "confirmed" | "processing" | "out_for_delivery" | "delivered" | "cancelled";
 export type PaymentStatus = "pending" | "paid" | "failed" | "refunded";
-export type PaymentMethod = "card" | "cod" | "upi" | "wallet";
+export type PaymentMethod = "card" | "cod" | "upi" | "wallet" | "razorpay";
 
 export interface IOrderItem extends Document {
     productId: mongoose.Types.ObjectId | IProduct;
@@ -25,6 +25,9 @@ export interface IOrder extends Document {
     paymentMethod: PaymentMethod;
     createdAt: string;
     updatedAt: string;
+    razorpayOrderId?: string;
+    razorpayPaymentId?: string;
+    razorpaySignature?: string;
 }
 
 const orderItemSchema = new Schema<IOrderItem>({
@@ -53,9 +56,12 @@ const orderSchema = new Schema<IOrder>(
         },
         paymentMethod: { 
             type: String, 
-            enum: ["card", "cod", "upi", "wallet"], 
+            enum: ["card", "cod", "upi", "wallet", "razorpay"], 
             required: true 
         },
+        razorpayOrderId: { type: String },
+        razorpayPaymentId: { type: String },
+        razorpaySignature: { type: String },
     },
     {
         timestamps: true,
