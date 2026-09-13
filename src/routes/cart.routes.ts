@@ -3,7 +3,8 @@ import {
     addToCart,
     getMyCarts,
     updateCartItem,
-    removeFromCart
+    removeFromCart,
+    clearCart
 } from '../controllers/cart.controller';
 import { authenticate } from '../middleware/auth.middleware';
 import { validate } from '../middleware/validate.middleware';
@@ -15,7 +16,8 @@ router.use(authenticate);
 
 router.route('/')
     .get(getMyCarts)
-    .post(validate(addToCartSchema), addToCart);
+    .post(validate(addToCartSchema), addToCart)
+    .delete(clearCart);
 
 router.route('/:productId')
     .put(validate(updateCartItemSchema), updateCartItem)

@@ -97,3 +97,14 @@ export const removeFromCart = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ message: 'Server Error', error });
     }
 };
+
+// Clear Cart || DELETE /api/cart || Private
+export const clearCart = async (req: AuthRequest, res: Response) => {
+    try {
+        const customerId = req.user!._id;
+        await Cart.deleteMany({ customerId });
+        res.status(200).json({ message: 'Cart cleared successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error', error });
+    }
+};
