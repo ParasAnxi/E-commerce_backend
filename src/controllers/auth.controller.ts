@@ -4,7 +4,7 @@ import { User } from '../models/user.model';
 
 const generateAccessToken = (id: string): string => {
     return jwt.sign({ id }, process.env.JWT_SECRET as string, {
-        expiresIn: '15m',
+        expiresIn: '7d',
     });
 };
 
@@ -19,7 +19,7 @@ const setCookies = (res: Response, accessToken: string, refreshToken: string) =>
         httpOnly: true,
         secure: process.env.NODE_ENV !== 'development',
         sameSite: 'strict',
-        maxAge: 15 * 60 * 1000,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.cookie('refreshToken', refreshToken, {
@@ -48,7 +48,7 @@ export const register = async (req: Request, res: Response) => {
             const refreshToken = generateRefreshToken(user.id);
             setCookies(res, accessToken, refreshToken);
 
-            res.status(201).json({ _id: user.id, name: user.name, email: user.email, role: user.role });
+            res.status(201).json({ _id: user.id, name: user.name, email: user.email, role: user.role, phone: user.phone, address: user.address });
         } else {
             res.status(400).json({ message: 'Invalid user data' });
         }
@@ -67,7 +67,7 @@ export const login = async (req: Request, res: Response) => {
             const refreshToken = generateRefreshToken(user.id);
             setCookies(res, accessToken, refreshToken);
 
-            res.json({ _id: user.id, name: user.name, email: user.email, role: user.role });
+            res.json({ _id: user.id, name: user.name, email: user.email, role: user.role, phone: user.phone, address: user.address });
         } else {
             res.status(401).json({ message: 'Invalid email or password' });
         }
@@ -97,7 +97,7 @@ export const refresh = async (req: Request, res: Response) => {
             httpOnly: true,
             secure: process.env.NODE_ENV !== 'development',
             sameSite: 'strict',
-            maxAge: 15 * 60 * 1000,
+            maxAge: 7 * 24 * 60 * 60 * 1000,
         });
 
         res.json({ message: 'Token refreshed successfully' });
@@ -110,4 +110,42 @@ export const logout = (req: Request, res: Response) => {
     res.cookie('jwt', '', { httpOnly: true, expires: new Date(0) });
     res.cookie('refreshToken', '', { httpOnly: true, expires: new Date(0) });
     res.status(200).json({ message: 'Logged out successfully' });
+};
+
+export const updateProfile = async (req: Request, res: Response) => {
+    try {
+        const userReq = (req as any).user;
+        if (!userReq) return res.status(401).json({ message: 'Not authorized' });
+
+        const user = await User.findById(userReq.id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        const { name, phone, address } = req.body;
+
+        if (name) user.name = name;
+        if (phone !== undefined) user.phone = phone;
+        if (address) {
+            user.address = {
+                street: address.street || user.address?.street || '',
+                city: address.city || user.address?.city || '',
+                state: address.state || user.address?.state || '',
+                zipCode: address.zipCode || user.address?.zipCode || '',
+                country: address.country || user.address?.country || 'India',
+            };
+        }
+
+        await user.save();
+
+        res.json({
+            _id: user.id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+            phone: user.phone,
+            address: user.address,
+        });
+    } catch (error) {
+        console.error('Update profile error:', error);
+        res.status(500).json({ message: 'Server error during profile update' });
+    }
 };

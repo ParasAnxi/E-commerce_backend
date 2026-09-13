@@ -1,5 +1,5 @@
 import express from 'express';
-import { register, login, refresh, logout } from '../controllers/auth.controller';
+import { register, login, refresh, logout, updateProfile } from '../controllers/auth.controller';
 import { validate } from '../middleware/validate.middleware';
 import { registerSchema, loginSchema } from '../schemas/auth.schema';
 import { authRateLimiter } from '../middleware/rateLimiter';
@@ -15,5 +15,7 @@ router.post('/logout', logout);
 router.get('/me', authenticate, (req, res) => {
     res.json({ user: (req as any).user });
 });
+
+router.put('/profile', authenticate, updateProfile);
 
 export default router;
